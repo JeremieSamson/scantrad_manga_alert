@@ -21,3 +21,6 @@ parameters:
 
     # Add default url
     scantrad_manga_url: https://scantrad.fr/mangas
+
+    # Add admin email
+    admin_email: jeremie.samson76@gmail.com
