@@ -1,3 +1,4 @@
 parameters:
     database_user: travis
     database_password: ~
+    scantrad_manga_url: https://scantrad.fr/mangas
