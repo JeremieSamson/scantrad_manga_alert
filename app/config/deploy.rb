@@ -53,5 +53,9 @@ logger.level = Logger::MAX_LEVEL
 # Backup remote database to local
 before "deploy:rollback:revision", "database:dump:remote"
 
+# Update Database
+after "symfony:cache:warmup", "symfony:doctrine:schema:update"
+
 # Run deployment
 after "deploy", "deploy:cleanup" # Clean old releases at the end
+
