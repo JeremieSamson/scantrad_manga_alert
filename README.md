@@ -1,7 +1,6 @@
 # Scantrad Manga Alert
 
-
-[![Build Status](https://travis-ci.org/JeremieSamson/scantrad_manga_alert.svg?branch=master)](https://travis-ci.org/JeremieSamson/scantrad_manga_alert)
+[![Build Status](https://travis-ci.com/JeremieSamson/scantrad_manga_alert.svg?branch=master)](https://travis-ci.com/JeremieSamson/scantrad_manga_alert)
 
 ## Installation
 
