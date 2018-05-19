@@ -58,3 +58,16 @@ Ajouter le VHost
         CustomLog /var/log/apache2/scantrad_manga_alert.local.fr.log vhost_combined_time_end
 </VirtualHost>
 ```
+
+Créer la base de données
+
+```shell
+php bin/console doctrine:database:create
+php bin/console doctrine:schema:update --force
+```
+
+Synchroniser les premiers mangas et chapitre
+
+```shell
+php bin/console sync:chapter
+```
