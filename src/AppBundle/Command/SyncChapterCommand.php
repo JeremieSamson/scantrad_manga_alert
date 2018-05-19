@@ -3,12 +3,14 @@
 namespace AppBundle\Command;
 
 use AppBundle\Entity\Chapter;
+use AppBundle\Entity\EmailAlert;
 use AppBundle\Entity\Manga;
 use AppBundle\Service\Scraper;
 use Doctrine\ORM\EntityManager;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Validator\Constraints\Email;
 
 class SyncChapterCommand  extends ContainerAwareCommand
 {
@@ -75,6 +77,38 @@ class SyncChapterCommand  extends ContainerAwareCommand
                     $em->persist($chapter);
 
                     $output->writeln("<comment>Chapter $chapterName added</comment>");
+
+                    /** @var EmailAlert $emailAlert */
+                    foreach ($manga->getEmailAlerts() as $emailAlert){
+                        $email = $emailAlert->getEmail();
+
+                        $url = strtolower($manga->getName());
+                        $url = str_replace(' ', '-', $url);
+                        $url = str_replace('.', '', $url);
+
+                        $message = (new \Swift_Message("[$mangaName] Chapitre $chapterNum : $chapterName"))
+                            ->setFrom('no-reply@scantrad_manga_alert.fr')
+                            ->setTo($email)
+                            ->setBody(
+                                $this->getContainer()->get('twig')->render(
+                                    'email/new_chapter.html.twig',
+                                    array(
+                                        "manga" => $manga,
+                                        "chapter" => $chapter,
+                                        "url" => $url
+                                    )
+                                ),
+                                'text/html'
+                            )
+                        ;
+
+                        $res = $this->getContainer()->get('mailer')->send($message);
+
+                        if ($res)
+                            $output->writeln("<comment>Email sended to $email</comment>");
+                        else
+                            $output->writeln("<error>Email not sended to $email</error>");
+                    }
                 }
 
                 if (!$manga->getChapters()->contains($chapter)){

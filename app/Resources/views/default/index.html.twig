@@ -1,22 +1,17 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <div id="wrapper">
-        <div id="container">
-            <div id="welcome">
-                <h1>Scantrad Manga Alert</h1>
-                <h3>Soyez alerté en temps réel de la sortie de votre manga préféré</h3>
-            </div>
-
-            {% for label, messages in app.flashes %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ label }}">
-                        {{ message }}
-                    </div>
+    <section class="42">
+        <div class="container" >
+            <form id="form_manga" style="margin-top: 75px;margin-bottom: 75px;">
+                {% for label, messages in app.flashes %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ label }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
                 {% endfor %}
-            {% endfor %}
 
-            <form id="form_manga">
                 <div class="form-group">
                     <label for="manga">Manga</label><br>
                     <select name="manga" id="manga" class="form-control">
@@ -35,7 +30,7 @@
             {% endif %}
             </form>
         </div>
-    </div>
+    </section>
 {% endblock %}
 
 {% block javascripts %}

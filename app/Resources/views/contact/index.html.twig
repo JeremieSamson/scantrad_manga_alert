@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <section class="666">
+        <div class="container">
+            <form id="contact" style="margin-top: 75px;margin-bottom: 75px;">
+                {% for label, messages in app.flashes %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ label }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+
+                <div class="form-group">
+                    <label for="email">Adresse email*</label><br>
+                    <input id="email" name="email" type="email" placeholder="mugiwara@noluffy.com" class="form-control">
+                    <small id="emailHelp" class="form-text text-muted">Nous ne partagerons jamais votre email avec qui que ce soit.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="subject">Sujet*</label><br>
+                    <input id="subject" name="subject" type="text" placeholder="Sujet" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="message">Message*</label><br>
+                    <textarea name="message" id="message" class="form-control" rows="10" placeholder="Votre message"></textarea>
+                </div>
+                <input type="submit" value="Envoyer">
+            </form>
+        </div>
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        $(document).ready(function(){
+            $('#manga').change(function(){
+                $('#form_manga').submit();
+            });
+        });
+    </script>
+{% endblock %}

@@ -2,10 +2,13 @@
 <html>
     <head>
         <meta charset="UTF-8" />
-        <title>{% block title %}Welcome!{% endblock %}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <meta name="description" content="Scantrad manga chapter alert">
+        <meta name="author" content="Jérémie Samson">
 
-        <!-- Latest compiled and minified CSS -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <title>{% block title %}Scantrad Manga Alert{% endblock %}</title>
+
+        <link rel="stylesheet" href="{{ asset('vendor/bootstrap/css/bootstrap.css') }}">
 
         <!-- jQuery library -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
@@ -16,8 +19,19 @@
         {% block stylesheets %}{% endblock %}
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
     </head>
+
     <body>
+        {{ include('nav.html.twig') }}
+
+        {{ include('header.html.twig') }}
+
         {% block body %}{% endblock %}
+
+        {{ include('footer.html.twig') }}
+
+        <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
+        <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+
         {% block javascripts %}{% endblock %}
     </body>
 </html>

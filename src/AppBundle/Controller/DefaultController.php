@@ -57,7 +57,7 @@ class DefaultController extends Controller
         }
 
         return $this->render('default/index.html.twig', [
-            'mangas' => $this->getDoctrine()->getRepository('AppBundle:Manga')->findAll(),
+            'mangas' => $this->getDoctrine()->getRepository('AppBundle:Manga')->findBy(array(), array("name" => "ASC")),
             'mangaSelected' => $manga
         ]);
     }
