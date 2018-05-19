@@ -51,8 +51,6 @@ class Scraper
             $tags = $xpath->query('//' .$tagName . '[contains(@class,"' .$className. '")]');
 
             return $tags;
-        } else {
-            var_dump("pas dom");
         }
 
         return null;

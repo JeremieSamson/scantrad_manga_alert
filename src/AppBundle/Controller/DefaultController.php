@@ -29,7 +29,6 @@ class DefaultController extends Controller
             $this->addFlash('danger', 'Le manga choisit n\'est pas correct');
 
         if ($email != null){
-            var_dump("ici");
             if (!filter_var($email, FILTER_VALIDATE_EMAIL))
                 $this->addFlash('danger', 'Le format de l\'email n\'est pas correct');
             elseif($manga){
