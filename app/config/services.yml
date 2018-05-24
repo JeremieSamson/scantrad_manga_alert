@@ -28,3 +28,8 @@ services:
         class:     AppBundle\Service\Scraper
         arguments: ['%scantrad_manga_url%']
         public: true
+
+    email_alert_info:
+        class:     AppBundle\Service\EmailAlertInfo
+        arguments: ['@doctrine.orm.entity_manager']
+        public: true

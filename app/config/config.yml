@@ -37,6 +37,7 @@ twig:
     strict_variables: '%kernel.debug%'
     globals:
         scantrad_manga_url: "%scantrad_manga_url%"
+        email_alert_info: "@email_alert_info"
 
 # Doctrine Configuration
 doctrine:
