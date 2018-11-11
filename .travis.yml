@@ -18,9 +18,6 @@ script:
 
 notifications:
   email:
-
-notifications:
-  email:
     recipients:
       - jeremie.samson76@gmail.com
     on_success: [never]

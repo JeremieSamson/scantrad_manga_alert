@@ -49,6 +49,7 @@ class Manga
     public function __construct()
     {
         $this->chapters = new ArrayCollection();
+        $this->emailAlerts = new ArrayCollection();
     }
 
     /**
