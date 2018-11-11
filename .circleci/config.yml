@@ -1,0 +1,47 @@
+version: 2
+jobs:
+  build:
+    docker:
+    - image: circleci/php:7.1-apache-node-browsers-legacy
+    - image: circleci/mysql:5.7
+
+    working_directory: ~/app
+
+    steps:
+    - checkout
+
+    - restore_cache:
+        keys:
+        - v1-dependencies-{{ checksum "composer.json" }}
+        - v1-dependencies-
+
+    - run:
+        name: Install PHP extensions
+        command: |
+          sudo docker-php-ext-install pdo_mysql
+          sudo docker-php-ext-enable pdo_mysql
+
+    - run:
+        name: Build setup
+        command: |
+          composer install -n --prefer-dist
+
+    - run:
+        name: Database Setup
+        command: |
+          php bin/console doctrine:database:create
+          php bin/console doctrine:schema:update -f
+          php bin/console doctrine:schema:update -f
+
+    - run:
+        name: Project Setup
+        command: |
+          php bin/console sync:chapter
+
+    - save_cache:
+        paths:
+        - ./vendor
+        key: v1-dependencies-{{ checksum "composer.json" }}
+
+    # run tests!
+    - run: php vendor/bin/phpunit
