@@ -21,19 +21,19 @@ class Scraper
     /**
      * @return \DOMElement
      */
-    public function getLastChapters(){
+    public function getLastChapters(): ? \DOMElement
+    {
         return $this->getElementsById("chapters-list");
     }
 
     /**
      * @param $id
-     * @return \DOMElement
      */
-    public function getElementsById($id)
+    public function getElementsById($id): ? \DOMElement
     {
         $dom = $this->getDomDocument($this->baseUrl);
 
-        return $dom->getElementById($id);
+        return $dom ? $dom->getElementById($id) : null;
     }
 
     /**

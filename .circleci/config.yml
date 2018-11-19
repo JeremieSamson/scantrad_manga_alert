@@ -1,47 +1,91 @@
-version: 2
-jobs:
-  build:
+version: 2.1
+
+executors:
+  my-executor:
+    working_directory: ~/app
     docker:
     - image: circleci/php:7.1-apache-node-browsers-legacy
     - image: circleci/mysql:5.7
 
-    working_directory: ~/app
-
+references:
+  attach_workspace: &attach_workspace
+    attach_workspace:
+      at: ~/app
+  enable_pdo_mysql: &enable_pdo_mysql
+    run:
+      name: Install PHP extensions
+      command: |
+        sudo docker-php-ext-install pdo_mysql
+        sudo docker-php-ext-enable pdo_mysql
+  setup_database: &setup_database
+    run:
+      name: Database Setup
+      command: |
+        php bin/console doctrine:database:create
+        php bin/console doctrine:schema:update -f
+  init_database: &init_database
+    run:
+      name: Project Setup
+      command: |
+        php bin/console sync:chapter
+jobs:
+  build:
+    executor: my-executor
     steps:
     - checkout
-
     - restore_cache:
         keys:
         - v1-dependencies-{{ checksum "composer.json" }}
         - v1-dependencies-
-
-    - run:
-        name: Install PHP extensions
-        command: |
-          sudo docker-php-ext-install pdo_mysql
-          sudo docker-php-ext-enable pdo_mysql
-
     - run:
         name: Build setup
         command: |
           composer install -n --prefer-dist
+    - save_cache:
+        paths:
+        - ./vendor
+        key: v1-dependencies-{{ checksum "composer.json" }}
+    - persist_to_workspace:
+        root: ./
+        paths: ./
 
-    - run:
-        name: Database Setup
-        command: |
-          php bin/console doctrine:database:create
-          php bin/console doctrine:schema:update -f
-          php bin/console doctrine:schema:update -f
-
+  load_content:
+    executor: my-executor
+    steps:
+    - *attach_workspace
+    - *enable_pdo_mysql
+    - *setup_database
     - run:
         name: Project Setup
         command: |
           php bin/console sync:chapter
 
-    - save_cache:
-        paths:
-        - ./vendor
-        key: v1-dependencies-{{ checksum "composer.json" }}
-
-    # run tests!
+  phpunit:
+    executor: my-executor
+    steps:
+    - *attach_workspace
+    - *enable_pdo_mysql
+    - *setup_database
+    - *init_database
     - run: php vendor/bin/phpunit
+
+  psalm:
+    executor: my-executor
+    steps:
+    - *attach_workspace
+    - run: php vendor/bin/psalm --show-info=false
+
+workflows:
+  version: 2
+  build_load_and_test:
+    jobs:
+    - build
+    - load_content:
+        requires:
+        - build
+    - phpunit:
+        requires:
+        - load_content
+    - psalm:
+        requires:
+        - build

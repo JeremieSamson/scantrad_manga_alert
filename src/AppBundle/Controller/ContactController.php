@@ -25,7 +25,7 @@ class ContactController extends Controller
         $message = $request->get('message');
 
         if ($request->query->has('email') && $request->query->has('subject') && $request->query->has('message')){
-            if (empty($email) || empty($subject) || empty($email)){
+            if (empty($email) || empty($subject)){
                 $this->addFlash('danger', 'Les trois champs sont obligatoire');
             } elseif(!filter_var($email, FILTER_VALIDATE_EMAIL)){
                 $this->addFlash('danger', 'Le format de l\'email n\'est pas correct');
