@@ -8,7 +8,7 @@ use Doctrine\ORM\EntityManager;
 class EmailAlertInfo
 {
     /**
-     * @var string
+     * @var EntityManager
      */
     private $em;
 

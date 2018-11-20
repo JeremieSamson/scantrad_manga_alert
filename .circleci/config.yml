@@ -4,70 +4,76 @@ executors:
   my-executor:
     working_directory: ~/app
     docker:
-      - image: circleci/php:7.1-apache-node-browsers-legacy
-      - image: circleci/mysql:5.7
+    - image: circleci/php:7.1-apache-node-browsers-legacy
+    - image: circleci/mysql:5.7
 
 references:
   attach_workspace: &attach_workspace
     attach_workspace:
       at: ~/app
   enable_pdo_mysql: &enable_pdo_mysql
-      run:
-        name: Install PHP extensions
-        command: |
-          sudo docker-php-ext-install pdo_mysql
-          sudo docker-php-ext-enable pdo_mysql
+    run:
+      name: Install PHP extensions
+      command: |
+        sudo docker-php-ext-install pdo_mysql
+        sudo docker-php-ext-enable pdo_mysql
   setup_database: &setup_database
-      run:
-        name: Database Setup
-        command: |
-          php bin/console doctrine:database:create
-          php bin/console doctrine:schema:update -f
+    run:
+      name: Database Setup
+      command: |
+        php bin/console doctrine:database:create
+        php bin/console doctrine:schema:update -f
   init_database: &init_database
-      run:
-        name: Project Setup
-        command: |
-          php bin/console sync:chapter
+    run:
+      name: Project Setup
+      command: |
+        php bin/console sync:chapter
 jobs:
   build:
     executor: my-executor
     steps:
-      - checkout
-      - restore_cache:
-          keys:
-          - v1-dependencies-{{ checksum "composer.json" }}
-          - v1-dependencies-
-      - run:
-          name: Build setup
-          command: |
-            composer install -n --prefer-dist
-      - save_cache:
-          paths:
-          - ./vendor
-          key: v1-dependencies-{{ checksum "composer.json" }}
-      - persist_to_workspace:
-          root: ./
-          paths: ./
+    - checkout
+    - restore_cache:
+        keys:
+        - v1-dependencies-{{ checksum "composer.json" }}
+        - v1-dependencies-
+    - run:
+        name: Build setup
+        command: |
+          composer install -n --prefer-dist
+    - save_cache:
+        paths:
+        - ./vendor
+        key: v1-dependencies-{{ checksum "composer.json" }}
+    - persist_to_workspace:
+        root: ./
+        paths: ./
 
   load_content:
     executor: my-executor
     steps:
-      - *attach_workspace
-      - *enable_pdo_mysql
-      - *setup_database
-      - run:
-          name: Project Setup
-          command: |
-            php bin/console sync:chapter
+    - *attach_workspace
+    - *enable_pdo_mysql
+    - *setup_database
+    - run:
+        name: Project Setup
+        command: |
+          php bin/console sync:chapter
 
   phpunit:
     executor: my-executor
     steps:
-      - *attach_workspace
-      - *enable_pdo_mysql
-      - *setup_database
-      - *init_database
-      - run: php vendor/bin/phpunit
+    - *attach_workspace
+    - *enable_pdo_mysql
+    - *setup_database
+    - *init_database
+    - run: php vendor/bin/phpunit
+
+  psalm:
+    executor: my-executor
+    steps:
+    - *attach_workspace
+    - run: php vendor/bin/psalm --show-info=false
 
 workflows:
   version: 2
@@ -76,7 +82,10 @@ workflows:
     - build
     - load_content:
         requires:
-          - build
+        - build
     - phpunit:
         requires:
-          - load_content
+        - load_content
+    - psalm:
+        requires:
+        - build
