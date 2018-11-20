@@ -1,6 +1,7 @@
 # Scantrad Manga Alert
 
 [![CircleCI](https://circleci.com/gh/JeremieSamson/scantrad_manga_alert/tree/master.svg?style=svg)](https://circleci.com/gh/JeremieSamson/scantrad_manga_alert/tree/master)
+[![SymfonyInsight](https://insight.symfony.com/projects/2f3d0fa6-9762-41b1-8cd9-48d5c709ed0b/mini.svg)](https://insight.symfony.com/projects/2f3d0fa6-9762-41b1-8cd9-48d5c709ed0b)
 
 ## Installation
 
