@@ -19,11 +19,11 @@ class Scraper
     }
 
     /**
-     * @return \DOMElement
+     * @return \DOMNodeList
      */
-    public function getLastChapters(): ? \DOMElement
+    public function getLastChapters(): ? \DOMNodeList
     {
-        return $this->getElementsById("chapters-list");
+        return $this->getElementsByClassName('div', 'home-manga');
     }
 
     /**

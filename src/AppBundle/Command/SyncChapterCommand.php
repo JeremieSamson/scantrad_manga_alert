@@ -42,17 +42,19 @@ class SyncChapterCommand  extends ContainerAwareCommand
         /** @var Scraper $scraper */
         $scraper = $this->getContainer()->get('scraper');
 
-        /** @var \DOMElement $chapters */
+        /** @var \DOMNodeList $chapters */
         $chapters = $scraper->getLastChapters();
 
-        /** @var \DOMElement $chapter */
-        foreach ($chapters->childNodes as $chapter){
+        /** @var \DOMNode $chapter */
+        foreach ($chapters as $chapter){
             /** @var \DOMNodeList $nodes */
             $nodes = $chapter->childNodes;
 
             if ($nodes && $nodes->length >= 7){
-                list($mangaName, $chapterNum) = explode(PHP_EOL, trim($nodes->item(1)->nodeValue));
-                list($chapterName, $time) = explode(PHP_EOL, trim($nodes->item(7)->nodeValue));
+                list($mangaName, $chapterName) = explode(PHP_EOL, trim($nodes->item(3)->nodeValue));
+                $chapterName = trim($chapterName);
+                $chapterNum = trim(substr($mangaName, strrpos($mangaName, ' ', -1), strlen($chapterName)));
+                $mangaName = substr($mangaName, 0, strrpos($mangaName, ' ', -1));
 
                 /** @var Manga $manga */
                 $manga = $em->getRepository('AppBundle:Manga')->findOneBy(array("name" => $mangaName));
