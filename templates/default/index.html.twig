@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <section class="42">
+        <div class="container" >
+            <form id="form_manga" style="margin-top: 75px;margin-bottom: 75px;">
+                {% for label, messages in app.flashes %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ label }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+
+                <div class="form-group">
+                    <label for="manga">Manga</label><br>
+                    <select name="manga" id="manga" class="form-control">
+                        {% for manga in mangas %}<option value="{{ manga.id }}" {% if mangaSelected is not null and manga.id == mangaSelected.id %}selected{% endif %}>{{ manga.name }}</option>{% endfor %}
+                    </select>
+                </div>
+
+            {% if mangaSelected is not null %}
+                <div class="form-group">
+                    <label for="email">Email</label><br>
+                    <input type="email" name="email" class="form-control" placeholder="mugiwara@noluffy.com"><br>
+                    <small id="emailHelp" class="form-text text-muted">Nous ne partagerons jamais votre email avec qui que ce soit.</small>
+                </div>
+
+                <input type="submit" value="Je m'abonne">
+            {% endif %}
+            </form>
+        </div>
+    </section>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        $(document).ready(function(){
+            $('#manga').change(function(){
+                $('#form_manga').submit();
+            });
+        });
+    </script>
+{% endblock %}

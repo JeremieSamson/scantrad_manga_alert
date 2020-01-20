@@ -1,0 +1,8 @@
+parameters:
+  SCANTRAD_URL: '%env(SCANTRAD_URL)%'
+
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false

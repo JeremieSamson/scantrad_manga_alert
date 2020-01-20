@@ -1,2 +1,6 @@
 twig:
-    default_path: '%kernel.project_dir%/templates'
+    debug: '%kernel.debug%'
+    strict_variables: '%kernel.debug%'
+    globals:
+        scantrad_manga_url: "%env(SCANTRAD_URL)%"
+        email_alert_info: '@App\Service\EmailAlertInfo'
