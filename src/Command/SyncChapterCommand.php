@@ -12,22 +12,28 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\SentMessage;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 class SyncChapterCommand extends Command
 {
     private $em;
     private $scraper;
     private $mailer;
+    private $sender;
+    private $generator;
 
-    public function __construct(EntityManagerInterface $em, Scraper $scraper, MailerInterface $mailer)
+    public function __construct(EntityManagerInterface $em, Scraper $scraper, MailerInterface $mailer, ParameterBagInterface $bag, UrlGeneratorInterface $generator)
     {
         parent::__construct();
 
         $this->em = $em;
         $this->scraper = $scraper;
         $this->mailer = $mailer;
+        $this->sender = $bag->get('MAILER_FROM');
+        $this->generator = $generator;
     }
 
     protected function configure()
@@ -98,14 +104,22 @@ class SyncChapterCommand extends Command
                         $url = str_replace('.', '', $url);
 
                         $email = (new TemplatedEmail())
-                            ->from('no-reply@scantrad_manga_alert.fr')
                             ->subject("[$mangaName] Chapitre $chapterNum : $chapterName")
+                            ->from($this->sender)
                             ->to($to)
                             ->htmlTemplate('email/new_chapter.html.twig')
                             ->context([
                                 "manga" => $manga,
                                 "chapter" => $chapter,
-                                "url" => $url
+                                "url" => $url,
+                                'unsubscribe_url' => $this->generator->generate(
+                                    'unsubscribe',
+                                    [
+                                        'mangaId' => $manga->getId(),
+                                        'emailId' => $emailAlert->getId()
+                                    ],
+                                    UrlGeneratorInterface::ABSOLUTE_URL
+                                )
                             ])
                         ;
 

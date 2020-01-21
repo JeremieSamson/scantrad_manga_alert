@@ -61,4 +61,28 @@ class DefaultController extends AbstractController
             'mangaSelected' => $manga
         ]);
     }
+
+    /**
+     * @Route("/unsubscribe/{mangaId}/{emailId}", name="unsubscribe")
+     */
+    public function unsubscribeAction(Request $request, int $mangaId, int $emailId)
+    {
+        $emailAlert = $this->getDoctrine()->getRepository(EmailAlert::class)->find($emailId);
+
+        if (!$emailAlert) {
+            $this->createNotFoundException();
+        }
+
+        $manga = $this->getDoctrine()->getRepository(Manga::class)->find($mangaId);
+
+        if (!$manga) {
+            $this->createNotFoundException();
+        }
+
+        if (!$emailAlert->getMangas()->c)
+
+        $this->addFlash('success', sprintf('Vous vous êtes bien désabonne des alertes sur le manga %s', $manga->getName()));
+
+        return $this->redirectToRoute('homepage');
+    }
 }

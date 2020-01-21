@@ -1,5 +1,6 @@
 parameters:
-  SCANTRAD_URL: '%env(SCANTRAD_URL)%'
+  SCANTRAD_URL: '%env(resolve:SCANTRAD_URL)%'
+  MAILER_FROM: '%env(resolve:MAILER_FROM)%'
 
 services:
   _defaults:

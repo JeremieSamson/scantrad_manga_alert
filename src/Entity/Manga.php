@@ -5,14 +5,12 @@ namespace App\Entity;
 use App\Entity\Traits\NameTrait;
 use App\Entity\Traits\TimestampableTrait;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Manga
- *
  * @ORM\Table(name="manga")
  * @ORM\Entity(repositoryClass="App\Repository\MangaRepository")
- *
  * @ORM\HasLifecycleCallbacks()
  */
 class Manga
@@ -20,8 +18,6 @@ class Manga
     use NameTrait, TimestampableTrait;
 
     /**
-     * @var int
-     *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -29,93 +25,58 @@ class Manga
     private $id;
 
     /**
-     * @var ArrayCollection
-     *
      * @ORM\OneToMany(targetEntity="Chapter", mappedBy="manga"))
      */
     private $chapters;
 
     /**
-     * @var ArrayCollection
-     *
      * @ORM\ManyToMany(targetEntity="EmailAlert", mappedBy="mangas")
      */
     private $emailAlerts;
 
-    /**
-     * Manga constructor.
-     */
     public function __construct()
     {
         $this->chapters = new ArrayCollection();
         $this->emailAlerts = new ArrayCollection();
     }
 
-    /**
-     * Get id
-     *
-     * @return int
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @param Chapter $chapter
-     * @return $this
-     */
-    public function addChapter(Chapter $chapter){
+    public function addChapter(Chapter $chapter): void
+    {
         $this->chapters->add($chapter);
 
         $chapter->setManga($this);
-
-        return $this;
     }
 
-    /**
-     * @param Chapter $chapter
-     * @return $this
-     */
-    public function deleteChapter(Chapter $chapter){
+    public function deleteChapter(Chapter $chapter):void
+    {
         $this->chapters->removeElement($chapter);
-
-        return $this;
     }
 
-    /**
-     * @return ArrayCollection
-     */
-    public function getChapters(){
+    public function getChapters(): Collection
+    {
         return $this->chapters;
     }
 
-    /**
-     * @param EmailAlert $alert
-     * @return $this
-     */
-    public function addEmailAlert(EmailAlert $alert){
-        $this->emailAlerts->add($alert);
-
-        $alert->addManga($this);
-
-        return $this;
+    public function addEmailAlert(EmailAlert $alert): void
+    {
+        if (!$this->emailAlerts->contains($alert)) {
+            $this->emailAlerts->add($alert);
+            $alert->addManga($this);
+        }
     }
 
-    /**
-     * @param EmailAlert $alert
-     * @return $this
-     */
-    public function removeEmailAlert(EmailAlert $alert){
+    public function removeEmailAlert(EmailAlert $alert): void
+    {
         $this->emailAlerts->removeElement($alert);
-
-        return $this;
     }
 
-    /**
-     * @return ArrayCollection
-     */
-    public function getEmailAlerts(){
+    public function getEmailAlerts(): Collection
+    {
         return $this->emailAlerts;
     }
 }

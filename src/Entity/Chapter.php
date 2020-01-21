@@ -7,11 +7,8 @@ use App\Entity\Traits\TimestampableTrait;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Chapter
- *
  * @ORM\Table(name="chapter")
  * @ORM\Entity(repositoryClass="App\Repository\ChapterRepository")
- *
  * @ORM\HasLifecycleCallbacks()
  */
 class Chapter
@@ -19,8 +16,6 @@ class Chapter
     use NameTrait, TimestampableTrait;
 
     /**
-     * @var int
-     *
      * @ORM\Column(name="id", type="integer")
      * @ORM\Id
      * @ORM\GeneratedValue(strategy="AUTO")
@@ -28,65 +23,36 @@ class Chapter
     private $id;
 
     /**
-     * @var int
-     *
      * @ORM\Column(name="number", type="integer")
      */
     private $number;
 
     /**
-     * @var Manga
-     *
      * @ORM\ManyToOne(targetEntity="Manga", inversedBy="chapters")
      */
     private $manga;
 
-    /**
-     * Get id
-     *
-     * @return int
-     */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * Set number
-     *
-     * @param integer $number
-     *
-     * @return Chapter
-     */
-    public function setNumber($number)
+    public function setNumber($number): void
     {
         $this->number = $number;
-
-        return $this;
     }
 
-    /**
-     * Get number
-     *
-     * @return int
-     */
-    public function getNumber()
+    public function getNumber(): int
     {
         return $this->number;
     }
 
-    /**
-     * @return Manga
-     */
-    public function getManga()
+    public function getManga(): Manga
     {
         return $this->manga;
     }
 
-    /**
-     * @param Manga $manga
-     */
-    public function setManga($manga)
+    public function setManga(Manga $manga): void
     {
         $this->manga = $manga;
     }
