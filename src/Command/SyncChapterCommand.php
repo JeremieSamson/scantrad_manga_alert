@@ -7,21 +7,27 @@ use App\Entity\EmailAlert;
 use App\Entity\Manga;
 use App\Service\Scraper;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\SentMessage;
 
 class SyncChapterCommand extends Command
 {
     private $em;
     private $scraper;
+    private $mailer;
 
-    public function __construct(EntityManagerInterface $em, Scraper $scraper)
+    public function __construct(EntityManagerInterface $em, Scraper $scraper, MailerInterface $mailer)
     {
         parent::__construct();
 
         $this->em = $em;
         $this->scraper = $scraper;
+        $this->mailer = $mailer;
     }
 
     protected function configure()
@@ -33,18 +39,14 @@ class SyncChapterCommand extends Command
         ;
     }
 
-    /**
-     * Execute command
-     *
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     *
-     * @return int|null|void
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $io = new SymfonyStyle($input, $output);
+
         /** @var \DOMNodeList $chapters */
         $chapters = $this->scraper->getLastChapters();
+
+        $io->note(sprintf('Starting syncing %d chapter(s)', $chapters->count()));
 
         /** @var \DOMNode $chapter */
         foreach ($chapters as $chapter){
@@ -61,69 +63,69 @@ class SyncChapterCommand extends Command
                 $manga = $this->em->getRepository('App:Manga')->findOneBy(array("name" => $mangaName));
 
                 if (!$manga){
+                    $io->note("Manga not found in database");
+
                     $manga = new Manga();
                     $manga->setName($mangaName);
 
                     $this->em->persist($manga);
 
-                    $output->writeln("<comment>Manga $mangaName added</comment>");
+                    $io->success("Manga $mangaName added");
+                } else {
+                    $io->note("Manga $mangaName already exists");
                 }
 
                 /** @var Chapter $chapter */
                 $chapter = $this->em->getRepository('App:Chapter')->findOneBy(array("name" => $chapterName));
 
                 if (!$chapter){
+                    $io->note("Chapter not found in database");
+
                     $chapter = new Chapter();
                     $chapter->setName($chapterName);
                     $chapter->setNumber($chapterNum);
 
                     $this->em->persist($chapter);
 
-                    $output->writeln("<comment>Chapter $chapterName added</comment>");
+                    $io->success("Chapter $chapterName n°$chapterNum added");
 
                     /** @var EmailAlert $emailAlert */
                     foreach ($manga->getEmailAlerts() as $emailAlert){
-                        $email = $emailAlert->getEmail();
+                        $to = $emailAlert->getEmail();
 
                         $url = strtolower($manga->getName());
                         $url = str_replace(' ', '-', $url);
                         $url = str_replace('.', '', $url);
 
-                        $message = (new \Swift_Message("[$mangaName] Chapitre $chapterNum : $chapterName"))
-                            ->setFrom('no-reply@scantrad_manga_alert.fr')
-                            ->setTo($email)
-                            ->setBody(
-                                $this->getContainer()->get('twig')->render(
-                                    'email/new_chapter.html.twig',
-                                    array(
-                                        "manga" => $manga,
-                                        "chapter" => $chapter,
-                                        "url" => $url
-                                    )
-                                ),
-                                'text/html'
-                            )
+                        $email = (new TemplatedEmail())
+                            ->from('no-reply@scantrad_manga_alert.fr')
+                            ->subject("[$mangaName] Chapitre $chapterNum : $chapterName")
+                            ->to($to)
+                            ->htmlTemplate('email/new_chapter.html.twig')
+                            ->context([
+                                "manga" => $manga,
+                                "chapter" => $chapter,
+                                "url" => $url
+                            ])
                         ;
 
-                        $res = $this->getContainer()->get('mailer')->send($message);
+                        /** @var SentMessage $sentEmail */
+                        $this->mailer->send($email);
 
-                        if ($res)
-                            $output->writeln("<comment>Email sended to $email</comment>");
-                        else
-                            $output->writeln("<error>Email not sended to $email</error>");
+                        $io->success("Email sended to $email");
                     }
                 }
 
                 if (!$manga->getChapters()->contains($chapter)){
                     $manga->addChapter($chapter);
 
-                    $output->writeln("<comment>Chapter $chapterName added to manga $mangaName</comment>");
+                    $io->success("Chapter $chapterName added to manga $mangaName");
                 }
 
                 try {
                     $this->em->flush();
                 }catch (\Exception $e){
-                    $output->writeln("<error>" .$e->getMessage(). "</error>");
+                    $io->error($e->getMessage());
                 }
             }
         }
