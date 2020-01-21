@@ -2,6 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\EmailAlert;
+use App\Entity\Manga;
+use App\Repository\MangaRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
