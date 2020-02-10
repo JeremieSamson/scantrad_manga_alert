@@ -48,6 +48,8 @@ class SendMailCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
+        print_r($_ENV);
+
         $manga = new Manga();
         $manga->setName("[Manga name]");
 
