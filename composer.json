@@ -67,7 +67,7 @@
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
         },
         "pre-install-cmd":  [
-            "composer dump-env prod"
+            "heroku config -s -a mangaalert > .env.prod"
         ],
         "post-install-cmd": [
             "@auto-scripts"
