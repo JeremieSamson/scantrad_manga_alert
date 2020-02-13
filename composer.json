@@ -66,8 +66,10 @@
             "cache:clear": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
         },
+        "pre-install-cmd": [
+            "composer dump-env prod"
+        ],
         "post-install-cmd": [
-            "composer dump-env prod",
             "@auto-scripts"
         ],
         "post-update-cmd": [
